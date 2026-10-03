@@ -23,12 +23,19 @@ describe("mytoken deploy", () => {
   it("should return decimals", async () => {
     expect(await myTokenC.decimals()).equal(18);
   });
-  it("should return 0 totalSupply", async () => {
+  it("should return 1MT totalSupply", async () => {
     expect(await myTokenC.totalSupply()).equal(1n * 10n ** 18n);
   });
   // 1MT = 1 * 10^18
   it("should return 1MT balance for signer 0", async () => {
     const signer = signers[0];
     expect(await myTokenC.balanceOf(signer.address)).equal(1n * 10n ** 18n);
+  });
+  it("should have 0.5MT", async () => {
+    const signer1 = signers[1];
+    await myTokenC.transfer(hre.ethers.parseUnits("0.5", 18), signer1.address);
+    expect(await myTokenC.balanceOf(signer1.address)).equal(
+      hre.ethers.parseUnits("0.5", 18),
+    );
   });
 });

@@ -13,7 +13,7 @@ contract MyToken {
         name = _name;
         symbol = _symbol;
         decimals = _decimal;
-        _mint(1 * 10 ** decimals, msg.sender);
+        _mint(1 * 10 ** uint256(decimals), msg.sender);
     }
 
     // msg.sender : 보내는 사람
@@ -23,15 +23,9 @@ contract MyToken {
         balanceOf[owner] += amount;
     }
 
-    //function totalSupply() external view returns (uint256) {
-    //    return totalSupply;
-    //}
-
-    //function balanceOf(address owner) external view returns (uint256) {
-    //    return balanceOf[owner];
-    //}
-
-    //function name() external view returns (string memory) {
-    //    return name;
-    //}
+    function transfer(uint256 amount, address to) external {
+        require(balanceOf[msg.sender] >= amount, "insufficient balance");
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+    }
 }
