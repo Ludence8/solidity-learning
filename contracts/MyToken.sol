@@ -13,6 +13,14 @@ contract MyToken {
         name = _name;
         symbol = _symbol;
         decimals = _decimal;
+        _mint(1 * 10 ** decimals, msg.sender);
+    }
+
+    // msg.sender : 보내는 사람
+
+    function _mint(uint256 amount, address owner) internal {
+        totalSupply += amount;
+        balanceOf[owner] += amount;
     }
 
     //function totalSupply() external view returns (uint256) {
