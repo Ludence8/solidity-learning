@@ -35,7 +35,6 @@ describe("My Token", () => {
     });
   });
 
-  // 1MT = 1 * 10^18
   describe("Mint", () => {
     it("should return 1MT balance for signer 0", async () => {
       const signer = signers[0];
