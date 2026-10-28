@@ -39,6 +39,10 @@ contract MyToken {
         emit Transfer(from, to, amount);
     }
 
+    function mint(uint256 amount, address owner) external {
+        _mint(amount, owner);
+    }
+
     // msg.sender : 보내는 사람
 
     function _mint(uint256 amount, address owner) internal {
