@@ -43,6 +43,14 @@ describe("My Token", () => {
         MINTING_AMOUNT * 10n ** DECIMALS,
       );
     });
+
+    it("should return or revert when minting infinitly", async () => {
+      const hacker = signers[2];
+      const mintingAgainAmount = hre.ethers.parseUnits("10000", DECIMALS);
+      await expect(
+        myTokenC.connect(hacker).mint(mintingAgainAmount, hacker.address),
+      ).to.be.revertedWith("You are not authorized to manange this token");
+    });
   });
 
   describe("Transfer", () => {
@@ -108,7 +116,7 @@ describe("My Token", () => {
       ).to.be.revertedWith("insufficient allowance");
     });
     // HW2 : approve, transferFrom test
-    it("should transfer signer0's 10MT to signer1 with approve, transferFrom", async () => {
+    it("HW2 : should transfer signer0's 10MT to signer1 with approve, transferFrom", async () => {
       const signer0 = signers[0];
       const signer1 = signers[1];
       await myTokenC
