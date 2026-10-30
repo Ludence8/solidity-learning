@@ -78,7 +78,43 @@ describe("TinyBank", () => {
       const rewardToChange = hre.ethers.parseUnits("10000", DECIMALS);
       await expect(
         tinyBankC.connect(hacker).setRewardPerBlock(rewardToChange),
-      ).to.be.revertedWith("You are not authorized to manage this contract");
+      ).to.be.revertedWith("You are not a manager");
+    });
+
+    describe("HW3 : onlyAllConfirmed", () => {
+      const newReward = hre.ethers.parseUnits("100", DECIMALS);
+      beforeEach(async () => {
+        await tinyBankC.addManager(signers[1].address);
+        await tinyBankC.addManager(signers[2].address);
+      });
+
+      // 추가한 세 명에 대해서 Manager가 맞는지 확인하는 테스트
+      it("register three nanagers", async () => {
+        expect(await tinyBankC.isManager(signers[0].address)).equal(true);
+        expect(await tinyBankC.isManager(signers[1].address)).equal(true);
+        expect(await tinyBankC.isManager(signers[2].address)).equal(true);
+      });
+      // connect를 통해 Manager가 아닌 signer가 트랜잭션을 보내도록 하고, 실패하는지 확인하는 테스트
+      it("rejects confirmation from non-manager", async () => {
+        await expect(
+          tinyBankC.connect(signers[3]).confirm(),
+        ).to.be.revertedWith("You are not a manager");
+      });
+      // Manager 세 명 중 두명만 동의했을 때 confirm되는지 확인하는 테스트
+      it("rejects a reward change when one manager has not confirmed", async () => {
+        await tinyBankC.connect(signers[0]).confirm();
+        await tinyBankC.connect(signers[1]).confirm();
+        await expect(tinyBankC.setRewardPerBlock(newReward)).to.be.revertedWith(
+          "Not all confirmed yet",
+        );
+      });
+      // Manager 세 명 모두 동의했을 때 rewardPerBlock이 변경되는지 확인하는 테스트
+      it("allows a reward change after all managers confirm", async () => {
+        await tinyBankC.connect(signers[0]).confirm();
+        await tinyBankC.connect(signers[1]).confirm();
+        await tinyBankC.connect(signers[2]).confirm();
+        await expect(tinyBankC.setRewardPerBlock(newReward)).not.to.be.reverted;
+      });
     });
   });
 });
