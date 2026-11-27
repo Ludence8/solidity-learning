@@ -37,10 +37,12 @@ describe("My Token", () => {
   });
 
   describe("Mint", () => {
-    it("should return 1MT balance for signer 0", async () => {
+    it("should return initial supply + 1MT balance for signer 0", async () => {
       const signer = signers[0];
+      const oneMT = hre.ethers.parseUnits("1", DECIMALS);
+      await myTokenC.mint(oneMT, signer.address);
       expect(await myTokenC.balanceOf(signer.address)).equal(
-        MINTING_AMOUNT * 10n ** DECIMALS,
+        MINTING_AMOUNT * 10n ** DECIMALS + oneMT,
       );
     });
 

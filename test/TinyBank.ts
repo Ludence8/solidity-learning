@@ -36,7 +36,9 @@ describe("TinyBank", () => {
       const signer0 = signers[0];
       const stakingAmount = hre.ethers.parseUnits("50", DECIMALS);
       await myTokenC.approve(await tinyBankC.getAddress(), stakingAmount);
-      await tinyBankC.stake(stakingAmount);
+      await expect(tinyBankC.stake(stakingAmount))
+        .to.emit(tinyBankC, "Staked")
+        .withArgs(signer0.address, stakingAmount);
       expect(await tinyBankC.staked(signer0.address)).equal(stakingAmount);
       expect(await myTokenC.balanceOf(tinyBankC)).equal(
         await tinyBankC.totalStaked(),
@@ -78,7 +80,7 @@ describe("TinyBank", () => {
       const rewardToChange = hre.ethers.parseUnits("10000", DECIMALS);
       await expect(
         tinyBankC.connect(hacker).setRewardPerBlock(rewardToChange),
-      ).to.be.revertedWith("You are not a manager");
+      ).to.be.revertedWith("You are not authorized to manage this contract");
     });
 
     describe("HW3 : onlyAllConfirmed", () => {
