@@ -15,7 +15,7 @@ contract TinyBank is ManagedAccess {
 
     IMyToken public stakingToken;
 
-    mapping(address => uint256) public lastClainedBlock;
+    mapping(address => uint256) public lastClaimedBlock;
 
     uint256 defaultRewardPerBlock = 1 * 10 ** 18;
     uint256 rewardPerBlock;
@@ -27,19 +27,19 @@ contract TinyBank is ManagedAccess {
         rewardPerBlock = defaultRewardPerBlock;
     }
 
-    function setRewardPerBlock(uint256 _amount) external onlyAllConfirmed {
+    function setRewardPerBlock(uint256 _amount) external onlyManager {
         rewardPerBlock = _amount;
     }
 
     modifier updateReward(address to) {
         if (staked[to] > 0) {
-            uint256 blocks = block.number - lastClainedBlock[to];
+            uint256 blocks = block.number - lastClaimedBlock[to];
             uint256 reward = (blocks * rewardPerBlock * staked[to]) /
                 totalStaked;
             stakingToken.mint(reward, to);
         }
 
-        lastClainedBlock[to] = block.number;
+        lastClaimedBlock[to] = block.number;
         _; // caller's code
     }
 
@@ -57,5 +57,14 @@ contract TinyBank is ManagedAccess {
         staked[msg.sender] -= _amount;
         totalStaked -= _amount;
         emit Withdraw(_amount, msg.sender);
+    }
+
+    function currentReward(address to) external view returns (uint256) {
+        if (staked[to] > 0) {
+            uint256 blocks = block.number - lastClaimedBlock[to];
+            return (blocks * rewardPerBlock * staked[to]) / totalStaked;
+        } else {
+            return 0;
+        }
     }
 }
